@@ -65,7 +65,7 @@ namespace WebMaze
                     config.LoginPath = "/Account/Login";
                     config.AccessDeniedPath = "/Account/AccessDenied";
                 })
-                .AddCookie(PoliceAuthMethod, config => 
+                .AddCookie(PoliceAuthMethod, config =>
                 {
                     config.Cookie.Name = "PUser";
                     config.LoginPath = "/Police/Login";
@@ -93,7 +93,7 @@ namespace WebMaze
 
             services.AddHttpContextAccessor();
 
-            services.AddControllersWithViews().AddJsonOptions(opt => 
+            services.AddControllersWithViews().AddJsonOptions(opt =>
             {
                 opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
@@ -141,7 +141,6 @@ namespace WebMaze
             configurationExpression.CreateMap<RecordForm, ListRecordFormViewModel>();
             configurationExpression.CreateMap<ListRecordFormViewModel, RecordForm>();
 
-            
             configurationExpression.CreateMap<UserTask, UserTaskViewModel>();
             configurationExpression.CreateMap<UserTaskViewModel, UserTask>();
             
@@ -159,9 +158,13 @@ namespace WebMaze
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(v => v.User.FirstName + " " + v.User.LastName))
                 .ForMember(dest => dest.PolicemanName, opt => opt.MapFrom(v => v.BlamingPoliceman.User.FirstName + " " + v.BlamingPoliceman.User.LastName));
 
-            configurationExpression.CreateMap<ViolationRegistrationViewModel, Violation>();
+            configurationExpression.CreateMap<ViolationDeclarationViewModel, ViolationDeclaration>()
+                .ForMember(dest => dest.OffenseType, opt => opt.MapFrom(v => v.OffenseType.ToString()));
 
             configurationExpression.CreateMap<PoliceCertificate, PoliceCertificateItemViewModel>();
+
+            configurationExpression.CreateMap<CitizenUser, FoundUsersViewModel>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(u => u.FirstName + " " + u.LastName));
 
             configurationExpression.CreateMap<MedicalInsurance, MedicalInsuranceViewModel>();
             configurationExpression.CreateMap<MedicalInsuranceViewModel, MedicalInsurance>();
@@ -186,6 +189,12 @@ namespace WebMaze
             configurationExpression.CreateMap<MedicineCertificate, MedicineCertificateViewModel>();
             configurationExpression.CreateMap<MedicineCertificateViewModel, MedicineCertificate>();
 
+            configurationExpression.CreateMap<ReceptionOfPatients, ReceptionOfPatientsViewModel>();
+            configurationExpression.CreateMap<ReceptionOfPatientsViewModel, ReceptionOfPatients>();
+
+            configurationExpression.CreateMap<ReceptionOfPatients, UserPageViewModel>();
+            configurationExpression.CreateMap<UserPageViewModel, ReceptionOfPatients>();
+
             var mapperConfiguration = new MapperConfiguration(configurationExpression);
             var mapper = new Mapper(mapperConfiguration);
             services.AddScoped<IMapper>(s => mapper);
@@ -204,6 +213,7 @@ namespace WebMaze
             services.AddScoped(s => new PolicemanRepository(s.GetService<WebMazeContext>()));
             services.AddScoped(s => new PoliceCertificateRepository(s.GetService<WebMazeContext>()));
             services.AddScoped(s => new ViolationRepository(s.GetService<WebMazeContext>()));
+            services.AddScoped(s => new ViolationDeclarationRepository(s.GetService<WebMazeContext>()));
 
             services.AddScoped(s => new HealthDepartmentRepository(s.GetService<WebMazeContext>()));
 
@@ -221,6 +231,7 @@ namespace WebMaze
 
             services.AddScoped(s => new MedicalInsuranceRepository(s.GetService<WebMazeContext>()));
             services.AddScoped(s => new MedicineCertificateRepository(s.GetService<WebMazeContext>()));
+            services.AddScoped(s => new ReceptionOfPatientsRepository(s.GetService<WebMazeContext>()));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
