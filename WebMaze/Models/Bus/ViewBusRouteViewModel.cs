@@ -4,16 +4,19 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using WebMaze.DbStuff.Model;
 using WebMaze.Models.CustomAttribute;
 
 namespace WebMaze.Models.Bus
 {
-    public class CreateBusRouteViewModel
+    public class ViewBusRouteViewModel
     {   
-        public long Id { get; set; }
+        public List<BusRoute> Routes { get; set; }
 
-        [BusRouteLenght]
-        public string Route { get; set; }
+        public ViewBusRouteViewModel() :base()
+        {
+            Routes = new List<BusRoute>();
+        }
 
     }
 }

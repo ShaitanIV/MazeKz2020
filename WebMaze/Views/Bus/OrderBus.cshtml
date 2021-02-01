@@ -1,7 +1,22 @@
 ﻿@using WebMaze.Models.Bus
-
+@model BusOrderViewModel
 
 <div>
-    @Html.Partial("BusAdminPartial")
+    <a class="nav-link text-dark" href="/Bus/Index">Track Bus</a>
 </div>
 <div> Form for companies to order bus </div>
+
+<form action="@Url.Action("OrderBus", "Bus")" method="post">
+    <div>
+        Date:@Html.EditorFor(x=>x.TargetedDate)
+    </div>
+    <div>
+        Order description: @Html.TextBoxFor(x => x.OrderDescription)
+    </div>
+    <div>
+        @Html.ValidationMessageFor(x => x.TargetedDate)
+    </div>
+    <div>
+        <input type="submit" value="Order bus" />
+    </div>
+</form>

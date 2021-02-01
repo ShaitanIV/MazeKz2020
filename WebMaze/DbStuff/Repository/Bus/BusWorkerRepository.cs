@@ -4,7 +4,7 @@ using WebMaze.DbStuff.Model;
 
 namespace WebMaze.DbStuff.Repository
 {
-    public class BusWorkerRepository : BaseRepository<Bus>
+    public class BusWorkerRepository : BaseRepository<BusWorker>
     {
         public BusWorkerRepository(WebMazeContext context) : base(context)
         {

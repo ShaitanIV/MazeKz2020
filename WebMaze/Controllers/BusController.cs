@@ -19,16 +19,28 @@ namespace WebMaze.Controllers
     {
         private BusRepository busRepository;
         private BusRouteRepository busRouteRepository;
+        private CitizenUserRepository citizenUserRepository;
+        private CertificateRepository certificateRepository;
+        private BusOrderRepository busOrderRepository;
+        private BusWorkerRepository busWorkerRepository;
         private IWebHostEnvironment hostEnvironment;
         private IMapper mapper;
 
         public BusController(BusRepository busRepository,
             BusRouteRepository busRouteRepository,
-            IMapper mapper,
+            CitizenUserRepository citizenUserRepository,
+         CertificateRepository certificateRepository,
+         BusOrderRepository busOrderRepository,
+         BusWorkerRepository busWorkerRepository,
+        IMapper mapper,
             IWebHostEnvironment hostEnvironment)
         {
             this.busRepository = busRepository;
             this.busRouteRepository = busRouteRepository;
+            this.citizenUserRepository = citizenUserRepository;
+            this.certificateRepository = certificateRepository;
+            this.busOrderRepository = busOrderRepository;
+            this.busWorkerRepository = busWorkerRepository;
             this.mapper = mapper;
             this.hostEnvironment = hostEnvironment;
         }
@@ -71,55 +83,55 @@ namespace WebMaze.Controllers
         [HttpGet]
         public IActionResult OrderBus()
         {
-            return View();
+            var viewModel = new BusOrderViewModel();
+            viewModel.OrderDate = DateTime.Now;
+            return View(viewModel);
         }
 
         [HttpPost]
         public IActionResult OrderBus(BusOrderViewModel viewModel)
         {
-            return View();
+            var busOrder = mapper.Map<BusOrder>(viewModel);
+            busOrderRepository.Save(busOrder);
+            viewModel.OrderDate = DateTime.Now;
+            return View(viewModel);
         }
 
         [HttpGet]
-        public IActionResult CreateBusRoute()
+        public IActionResult ViewBusRoute()
         {
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult CreateBusRoute(CreateBusRouteViewModel viewModel)
-        {
-            if(!ModelState.IsValid)
-            {
-                return View(viewModel);
-            }
-            var busRoute = mapper.Map<BusRoute>(viewModel);
-            busRouteRepository.Save(busRoute);
-            return View();
+            var viewModel = new ViewBusRouteViewModel();
+            viewModel.Routes = busRouteRepository.GetAll().ToList();
+            return View(viewModel);
         }
 
         [HttpGet]
-        public IActionResult ManageBusRouteTime()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult ManageBusRouteTime(BusRouteTimeManagmentViewModel viewModel)
+        public IActionResult ViewBusRouteTime()
         {
             return View();
         }
 
         [HttpGet]
-        public IActionResult ManageWorker()
+        public IActionResult ManageBusWorker()
         {
-            return View();
+            var viewmodel = new ManageBusWorkerViewModel();
+            viewmodel.CitizenUsers = citizenUserRepository.GetAll();
+            viewmodel.BusWorkers = busWorkerRepository.GetAll();
+            viewmodel.Certificates = certificateRepository.GetAll().Where(x => x.IssuedBy == "Bus").ToList();
+            return View(viewmodel);
         }
 
         [HttpPost]
-        public IActionResult ManageWorker(BusOrderViewModel viewModel)
+        public IActionResult ManageBusWorker(ManageBusWorkerViewModel viewModel)
         {
-            return View();
+            var busWorker = new BusWorker();
+            busWorker.Certificate = certificateRepository.Get(viewModel.CertificateId);
+            busWorker.CitizenUser = citizenUserRepository.Get(viewModel.CitizenUserId);
+            busWorkerRepository.Save(busWorker);
+            viewModel.CitizenUsers = citizenUserRepository.GetAll();
+            viewModel.BusWorkers = busWorkerRepository.GetAll();
+            viewModel.Certificates = certificateRepository.GetAll().Where(x => x.IssuedBy == "Bus").ToList();
+            return View(viewModel);
         }
 
         public IActionResult BusAdminPartial()

@@ -18,7 +18,14 @@ namespace WebMaze.Models.CustomAttribute
                 return new ValidationResult("Value must not be null");
             }
 
-            if((busOrderViewModel.TargetedDate-busOrderViewModel.OrderDate).Days<3)
+            if(!(value is DateTime))
+            {
+                return new ValidationResult("Validation intended for DateTime type");
+            }
+
+            var targetDate = (DateTime)value;
+
+            if((targetDate-busOrderViewModel.OrderDate).Days<3)
             {
                 return new ValidationResult("The order must be made at least 3 days in advance");
             }

@@ -47,5 +47,15 @@ namespace WebMaze.DbStuff.Repository
         {
             return await DbSet.Where(certificate => certificate.Owner.Login == userLogin).ToListAsync();
         }
+
+        public List<Certificate> GetAll()
+        {
+            return DbSet.ToList();
+        }
+
+        public Certificate Get(long id)
+        {
+            return DbSet.SingleOrDefault(x => x.Id == id);
+        }
     }
 }

@@ -14,6 +14,9 @@ namespace WebMaze.DbStuff.Model
         public long? WorkerId { get; set; }
         public string BusModel { get; set; }
         public int Capacity { get; set; }
+        public int? CurrentOccupation { get; set; }
+        public bool? ReversedDirection { get; set; }
+        public string? CurrentLocation { get; set; }
 
     }
 }
