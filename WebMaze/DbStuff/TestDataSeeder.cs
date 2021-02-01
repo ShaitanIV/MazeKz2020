@@ -6,21 +6,22 @@ using Microsoft.Extensions.DependencyInjection;
 using WebMaze.DbStuff.Model;
 using WebMaze.DbStuff.Model.UserAccount;
 using WebMaze.DbStuff.Repository;
-using WebMaze.Services;
 
 namespace WebMaze.DbStuff
 {
     public class TestDataSeeder
     {
-        private UserService userService;
+        private CitizenUserRepository citizenUserRepository;
+        private RoleRepository roleRepository;
 
         public TestDataSeeder(IServiceScope scope)
         {
-            userService = scope.ServiceProvider.GetService<UserService>();
+            citizenUserRepository = scope.ServiceProvider.GetService<CitizenUserRepository>();
+            roleRepository = scope.ServiceProvider.GetService<RoleRepository>();
 
-            if (userService == null)
+            if (citizenUserRepository == null || roleRepository == null)
             {
-                throw new Exception("Cannot get UserService from ServiceProvider.");
+                throw new Exception("Cannot get services from ServiceProvider.");
             }
         }
 
@@ -46,7 +47,7 @@ namespace WebMaze.DbStuff
                     LastLoginDate = new DateTime(2020, 10, 28),
                     FirstName = "Alexey",
                     LastName = "Tsoi",
-                    Gender = "Male",
+                    Gender = Gender.Male,
                     Email = "AlexeyTsoi@example.com",
                     PhoneNumber = "3333333333",
                     BirthDate = new DateTime(1977, 4, 2)
@@ -68,7 +69,7 @@ namespace WebMaze.DbStuff
                     LastLoginDate = new DateTime(2020, 12, 30),
                     FirstName = "Chuck",
                     LastName = "Norris",
-                    Gender = "Male",
+                    Gender = Gender.Male,
                     Email = "ChuckNorris@example.com",
                     PhoneNumber = "4444444444",
                     BirthDate = new DateTime(1940, 3, 10)
@@ -90,7 +91,7 @@ namespace WebMaze.DbStuff
                     LastLoginDate = new DateTime(2021, 1, 12),
                     FirstName = "Ivan",
                     LastName = "Sokolov",
-                    Gender = "Male",
+                    Gender = Gender.Male,
                     Email = "IvanSokolov@example.com",
                     PhoneNumber = "5555555555",
                     BirthDate = new DateTime(1980, 5, 17)
@@ -104,7 +105,7 @@ namespace WebMaze.DbStuff
                     LastLoginDate = new DateTime(2021, 1, 15),
                     FirstName = "Anastasia",
                     LastName = "Kuznecova",
-                    Gender = "Female",
+                    Gender = Gender.Female,
                     Email = "AnastasiaKuznecova@example.com",
                     PhoneNumber = "66666666",
                     BirthDate = new DateTime(1990, 11, 22)
@@ -118,7 +119,7 @@ namespace WebMaze.DbStuff
                     LastLoginDate = new DateTime(2021, 1, 16),
                     FirstName = "Arnold",
                     LastName = "Goldenberg",
-                    Gender = "Male",
+                    Gender = Gender.Male,
                     Email = "ArnoldGoldenberg@example.com",
                     PhoneNumber = "77777777",
                     BirthDate = new DateTime(1977, 5, 10)
@@ -132,7 +133,7 @@ namespace WebMaze.DbStuff
                     LastLoginDate = new DateTime(2021, 1, 17),
                     FirstName = "Aigerim",
                     LastName = "Alieva",
-                    Gender = "Female",
+                    Gender = Gender.Female,
                     Email = "AigerimAlieva@example.com",
                     PhoneNumber = "8888888888",
                     BirthDate = new DateTime(1983, 8, 3)
@@ -146,7 +147,7 @@ namespace WebMaze.DbStuff
                     LastLoginDate = new DateTime(2021, 1, 19),
                     FirstName = "Dias",
                     LastName = "Karimov",
-                    Gender = "Male",
+                    Gender = Gender.Male,
                     Email = "DiasKarimov@example.com",
                     PhoneNumber = "9999999999",
                     BirthDate = new DateTime(2005, 10, 5)
@@ -158,54 +159,48 @@ namespace WebMaze.DbStuff
 
         private void AddIfNotExistUsersWithRole(List<CitizenUser> users, string roleName = null)
         {
-            foreach (var user in users)
+            foreach (var user in users.Where(u => !citizenUserRepository.UserExists(u.Login)))
             {
-                var userFromDb = userService.FindByLogin(user.Login);
-
-                if (userFromDb == null)
+                if (roleName != null)
                 {
-                    userService.Save(user);
-                    if (roleName != null)
-                    {
-                        userService.AddToRole(user, roleName);
-                    }
+                    var role = roleRepository.GetRoleByName(roleName);
+                    user.Roles.Add(role);
                 }
+
+                citizenUserRepository.Save(user);
             }
         }
 
         private void AddCertificates()
         {
-            var allCitizens = userService.GetUsers();
+            var allCitizens = citizenUserRepository.GetUsersAsQueryable();
 
             // Ensure that all citizens have a birth certificate.
             AddIfNotExistCertificateToCitizens(allCitizens, "Birth Certificate");
 
             // Ensure that 5 citizens have a diploma.
             var citizenLoginsWithDiploma = new List<string> { "Bill", "Musk", "Stroustrup", "Tsoi", "Chuck" };
-            var citizenWithDiploma = allCitizens.Where(c => citizenLoginsWithDiploma.Contains(c.Login)).ToList();
+            var citizenWithDiploma = citizenUserRepository.GetUsersByLogins(citizenLoginsWithDiploma);
             AddIfNotExistCertificateToCitizens(citizenWithDiploma, "Diploma of Higher Education");
 
             // Ensure that citizens have a policeman certificate.
             var citizenLoginsWithPoliceCertificate = new List<string> { "Chuck" };
-            var policemen = allCitizens.Where(c => citizenLoginsWithPoliceCertificate.Contains(c.Login)).ToList();
+            var policemen = citizenUserRepository.GetUsersByLogins(citizenLoginsWithPoliceCertificate);
             AddIfNotExistCertificateToCitizens(policemen, "Policeman Certificate");
 
             // Ensure that citizens have a doctor certificate.
             var citizenLoginsWithDoctorCertificate = new List<string> { "Tsoi" };
-            var doctors = allCitizens.Where(c => citizenLoginsWithDoctorCertificate.Contains(c.Login)).ToList();
+            var doctors = citizenUserRepository.GetUsersByLogins(citizenLoginsWithDoctorCertificate);
             AddIfNotExistCertificateToCitizens(doctors, "Doctor Certificate");
         }
 
-        private void AddIfNotExistCertificateToCitizens(List<CitizenUser> citizens, string certificateName)
+        private void AddIfNotExistCertificateToCitizens(IQueryable<CitizenUser> citizens, string certificateName)
         {
-            foreach (var citizen in citizens)
+            foreach (var citizen in citizens.Where(user => user.Certificates.All(certificate => certificate.Name != certificateName)).ToList())
             {
-                if (citizen.Certificates.All(c => c.Name != certificateName))
-                {
-                    var certificate = GenerateCertificate(certificateName, citizen);
-                    citizen.Certificates.Add(certificate);
-                    userService.Save(citizen);
-                }
+                var certificate = GenerateCertificate(certificateName, citizen);
+                citizen.Certificates.Add(certificate);
+                citizenUserRepository.Save(citizen);
             }
         }
 

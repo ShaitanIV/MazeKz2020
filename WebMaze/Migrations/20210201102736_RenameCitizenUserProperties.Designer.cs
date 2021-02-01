@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebMaze.DbStuff;
 
 namespace WebMaze.Migrations
 {
     [DbContext(typeof(WebMazeContext))]
-    partial class WebMazeContextModelSnapshot : ModelSnapshot
+    [Migration("20210201102736_RenameCitizenUserProperties")]
+    partial class RenameCitizenUserProperties
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -91,17 +93,8 @@ namespace WebMaze.Migrations
                     b.Property<int>("Capacity")
                         .HasColumnType("int");
 
-                    b.Property<string>("CurrentLocation")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("CurrentOccupation")
-                        .HasColumnType("int");
-
                     b.Property<string>("RegistrationPlate")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool?>("ReversedDirection")
-                        .HasColumnType("bit");
 
                     b.Property<long?>("WorkerId")
                         .HasColumnType("bigint");
@@ -128,6 +121,9 @@ namespace WebMaze.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("OrderDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Route")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("TargetedDate")
@@ -196,17 +192,10 @@ namespace WebMaze.Migrations
                         .HasColumnType("bigint")
                         .UseIdentityColumn();
 
-                    b.Property<long>("CertificateId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("CitizenUserId")
-                        .HasColumnType("bigint");
+                    b.Property<string>("License")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CertificateId");
-
-                    b.HasIndex("CitizenUserId");
 
                     b.ToTable("BusWorker");
                 });
@@ -669,25 +658,6 @@ namespace WebMaze.Migrations
                     b.Navigation("BusRoute");
 
                     b.Navigation("Worker");
-                });
-
-            modelBuilder.Entity("WebMaze.DbStuff.Model.BusWorker", b =>
-                {
-                    b.HasOne("WebMaze.DbStuff.Model.UserAccount.Certificate", "Certificate")
-                        .WithMany()
-                        .HasForeignKey("CertificateId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WebMaze.DbStuff.Model.CitizenUser", "CitizenUser")
-                        .WithMany()
-                        .HasForeignKey("CitizenUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Certificate");
-
-                    b.Navigation("CitizenUser");
                 });
 
             modelBuilder.Entity("WebMaze.DbStuff.Model.Medicine.MedicalInsurance", b =>
