@@ -13,7 +13,7 @@
             <tr>
                 <td>@bus.BusRouteId;</td>
                 <td>@bus.Capacity;</td>
-                <td>@bus.Capacity;</td>
+                <td>@bus.BusModel;</td>
                 <td>@bus.RegistrationPlate;</td>
                 <td>@bus.CurrentOccupation</td>
             </tr>
@@ -37,6 +37,21 @@
                 </div>
                 <div>
                     <input type="submit" value="Add bus" />
+                </div>
+            </form>
+
+            <form action="@Url.Action("EditBus","Bus")" method="get">
+                <div>
+                    Chose id of the bus to edit it:
+                    <select name="BusId">
+                        @foreach (var bus in Model.Buses)
+                        {
+                            <option value="@bus.Id">@bus.Id</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <input type="submit" value="Edit Bus" />
                 </div>
             </form>
         </div>

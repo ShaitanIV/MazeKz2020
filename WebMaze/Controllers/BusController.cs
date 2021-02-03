@@ -73,7 +73,7 @@ namespace WebMaze.Controllers
         [HttpPost]
         public IActionResult ManageBus(BusManageViewModel viewModel)
         {
-            var bus = mapper.Map<Bus>(viewModel);
+            var bus = mapper.Map<Bus>(viewModel.Bus);
             busRepository.Save(bus);
 
 
@@ -95,6 +95,22 @@ namespace WebMaze.Controllers
             busOrderRepository.Save(busOrder);
             viewModel.OrderDate = DateTime.Now;
             return View(viewModel);
+        }
+
+        [HttpGet]
+        public IActionResult EditBus(long BusId)
+        {
+            var bus = busRepository.Get(BusId);
+            var busviewModel = mapper.Map<BusViewModel>(bus);
+            return View(busviewModel);
+        }
+
+        [HttpPost]
+        public IActionResult EditBus(BusViewModel viewModel)
+        {
+            var bus = mapper.Map<Bus>(viewModel);
+            busRepository.Save(bus);
+            return Redirect("/Bus/ManageBus");
         }
 
         [HttpGet]

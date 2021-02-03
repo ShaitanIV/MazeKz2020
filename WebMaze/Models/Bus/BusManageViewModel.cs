@@ -9,6 +9,7 @@ namespace WebMaze.Models.Bus
     public class BusManageViewModel
     {
         public BusViewModel Bus { get; set; }
+        public long BusId { get; set; }
         public List<BusViewModel> Buses { get; set; }
 
         public BusManageViewModel() : base()

@@ -1,0 +1,31 @@
+﻿@using WebMaze.Models.Bus
+@model BusViewModel
+
+<div>
+    @Html.Partial("BusAdminPartial")
+</div>
+
+
+        <div>
+            <form action="@Url.Action("EditBus", "Bus")" method="post">
+                <div>
+                    Registration plate: @Html.TextBoxFor(x => x.RegistrationPlate)
+                </div>
+                <div>
+                    Capacity: @Html.TextBoxFor(x => x.Capacity)
+                </div>
+                <div>
+                    Number of route:@Html.TextBoxFor(x => x.BusRouteId)
+                </div>
+                <div>
+                    Worker ID: @Html.TextBoxFor(x => x.WorkerId)
+                </div>
+                <div>
+                    Bus model: @Html.TextBoxFor(x=>x.BusModel)
+                </div>
+                <div>
+                    @Html.HiddenFor(x=>x.Id)
+                    <input type="submit" value="Edit bus" />
+                </div>
+            </form>
+        </div>
