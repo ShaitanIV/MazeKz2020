@@ -17,7 +17,7 @@ namespace WebMaze.Models.Bus
         [Required]
         public string BusModel { get; set; }
         [Required]
-        public long WorkerId { get; set; }
+        public long BusWorkerId { get; set; }
         [Required]
         public long BusRouteId { get; set; }
         public int CurrentOccupation { get; set; }

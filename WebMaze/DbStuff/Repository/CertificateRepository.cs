@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using WebMaze.DbStuff.Model;
 using WebMaze.DbStuff.Model.UserAccount;
 
 namespace WebMaze.DbStuff.Repository
@@ -56,6 +57,11 @@ namespace WebMaze.DbStuff.Repository
         public Certificate Get(long id)
         {
             return DbSet.SingleOrDefault(x => x.Id == id);
+        }
+
+        public Certificate GetByUserAndType(CitizenUser owner, string certifacateName)
+        {
+            return DbSet.SingleOrDefault(x => x.Name == certifacateName && x.Owner == owner);
         }
     }
 }

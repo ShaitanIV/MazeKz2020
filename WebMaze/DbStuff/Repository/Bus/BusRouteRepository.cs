@@ -10,5 +10,10 @@ namespace WebMaze.DbStuff.Repository
         {
         }
 
+        public bool RouteExists(string busRoute)
+        {
+            return dbSet.Any(x => x.Route == busRoute);
+        }
+
     }
 }

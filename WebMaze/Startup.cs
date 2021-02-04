@@ -240,6 +240,7 @@ namespace WebMaze
             services.AddScoped(s => new BusRouteRepository(s.GetService<WebMazeContext>()));
             services.AddScoped(s => new BusOrderRepository(s.GetService<WebMazeContext>()));
             services.AddScoped(s => new BusWorkerRepository(s.GetService<WebMazeContext>()));
+            services.AddScoped(s => new BusRouteTimeRepository(s.GetService<WebMazeContext>()));
 
             services.AddScoped(s => new UserTaskRepository(s.GetService<WebMazeContext>()));
             services.AddScoped(s => new CertificateRepository(s.GetService<WebMazeContext>()));

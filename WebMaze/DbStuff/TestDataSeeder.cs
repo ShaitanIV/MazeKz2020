@@ -13,11 +13,21 @@ namespace WebMaze.DbStuff
     {
         private CitizenUserRepository citizenUserRepository;
         private RoleRepository roleRepository;
+        private BusRouteRepository busRouteRepository;
+        private CertificateRepository certificateRepository;
+        private BusWorkerRepository busWorkerRepository;
+        private BusRepository busRepository;
+        private BusRouteTimeRepository busRouteTimeRepository;
 
         public TestDataSeeder(IServiceScope scope)
         {
             citizenUserRepository = scope.ServiceProvider.GetService<CitizenUserRepository>();
             roleRepository = scope.ServiceProvider.GetService<RoleRepository>();
+            busRouteRepository = scope.ServiceProvider.GetService<BusRouteRepository>();
+            busRepository = scope.ServiceProvider.GetService<BusRepository>();
+            certificateRepository = scope.ServiceProvider.GetService<CertificateRepository>();
+            busWorkerRepository = scope.ServiceProvider.GetService<BusWorkerRepository>();
+            busRouteTimeRepository = scope.ServiceProvider.GetService<BusRouteTimeRepository>();
 
             if (citizenUserRepository == null || roleRepository == null)
             {
@@ -32,6 +42,11 @@ namespace WebMaze.DbStuff
             AddRegularUsers();
 
             AddCertificates();
+
+            AddBusWorkers();
+            AddBusRoutes();
+            AddBusRouteTimes();
+            AddBuses();
         }
 
         private void AddDoctors()
@@ -151,6 +166,20 @@ namespace WebMaze.DbStuff
                     Email = "DiasKarimov@example.com",
                     PhoneNumber = "9999999999",
                     BirthDate = new DateTime(2005, 10, 5)
+                },
+                new CitizenUser
+                {
+                    Login = "BusWorker1",
+                    Password = "123",
+                    Balance = 1000,
+                    RegistrationDate = new DateTime(2021, 1, 19),
+                    LastLoginDate = new DateTime(2021, 1, 19),
+                    FirstName = "Ivan",
+                    LastName = "Ivanov",
+                    Gender = Gender.Male,
+                    Email = "BusWorker1@example.com",
+                    PhoneNumber = "+77777777777",
+                    BirthDate = new DateTime(1980, 1, 1)
                 }
             };
 
@@ -192,6 +221,11 @@ namespace WebMaze.DbStuff
             var citizenLoginsWithDoctorCertificate = new List<string> { "Tsoi" };
             var doctors = citizenUserRepository.GetUsersByLogins(citizenLoginsWithDoctorCertificate);
             AddIfNotExistCertificateToCitizens(doctors, "Doctor Certificate");
+
+            // Ensure that citizens have a bus driver license.
+            var citizenLoginsWithBusDriverLicense = new List<string> { "BusWorker1" };
+            var busWorkers = citizenUserRepository.GetUsersByLogins(citizenLoginsWithBusDriverLicense);
+            AddIfNotExistCertificateToCitizens(busWorkers, "Bus driver license");
         }
 
         private void AddIfNotExistCertificateToCitizens(IQueryable<CitizenUser> citizens, string certificateName)
@@ -239,9 +273,117 @@ namespace WebMaze.DbStuff
                     certificate.IssueDate = new DateTime(2020, 5, 3);
                     certificate.ExpiryDate = new DateTime(2021, 5, 3);
                     break;
+                case "Bus driver license":
+                    certificate.Description = "Official document, permitting a specific individual to operate bus.";
+                    certificate.IssuedBy = "Bus";
+                    certificate.IssueDate = new DateTime(2020, 5, 3);
+                    certificate.ExpiryDate = new DateTime(2030, 5, 3);
+                    break;
             }
 
             return certificate;
+        }
+
+        private void AddBusRoutes()
+        {
+            var busRoutes = new List<BusRoute>()
+            {
+                new BusRoute
+                {
+                    Route = "Central-Park-Lake-Cinema"
+                }
+            };
+
+            foreach (var busRoute in busRoutes.Where(x => !busRouteRepository.RouteExists(x.Route)))
+            {
+                busRouteRepository.Save(busRoute);
+            }
+        }
+
+        private void AddBusWorkers()
+        {
+            var busWorkers = new List<BusWorker>()
+            {
+                new BusWorker
+                {
+                    CitizenUser = citizenUserRepository.GetUserByLogin("BusWorker1"),
+                    Certificate = certificateRepository.GetByUserAndType(citizenUserRepository.GetUserByLogin("BusWorker1"),"Bus driver license")
+                }
+            };
+
+            foreach (var busWorker in busWorkers.Where(x=> !busWorkerRepository.WorkerExists(x.CitizenUser)))
+            {
+                busWorkerRepository.Save(busWorker);
+            }
+        }
+
+        private void AddBuses()
+        {
+            var Buses = new List<Bus>()
+            {
+                new Bus
+                {
+                    BusModel = "Kamaz",
+                    BusRouteId=1,
+                    Capacity=60,
+                    RegistrationPlate = "123AB12",
+                    BusWorker = busWorkerRepository.GetByCitizenUserId(citizenUserRepository.GetUserByLogin("BusWorker1").Id),
+                }
+            };
+
+            foreach (var bus in Buses.Where(x => !busRepository.BusExists(x.RegistrationPlate)))
+            {
+                busRepository.Save(bus);
+            }
+
+        }
+
+        private void AddBusRouteTimes()
+        {
+            var BusRouteTimes = new List<BusRouteTime>()
+            {
+                new BusRouteTime
+                {
+                    StartingPoint = "Park",
+                    EndingPoint = "Central",
+                    Minutes = 10
+                },
+                new BusRouteTime
+                {
+                    StartingPoint = "Park",
+                    EndingPoint = "Lake",
+                    Minutes = 10
+                },
+                new BusRouteTime
+                {
+                    StartingPoint = "Lake",
+                    EndingPoint = "Park",
+                    Minutes = 10
+                },
+               new BusRouteTime
+                {
+                    StartingPoint = "Central",
+                    EndingPoint = "Park",
+                    Minutes = 10
+                },
+                new BusRouteTime
+                {
+                    StartingPoint = "Lake",
+                    EndingPoint = "Cinema",
+                    Minutes = 10
+                },
+                new BusRouteTime
+                {
+                    StartingPoint = "Cinema",
+                    EndingPoint = "Lake",
+                    Minutes = 10
+                }
+            };
+
+            foreach (var busRouteTime in BusRouteTimes.Where(x => !busRouteTimeRepository.BusRouteTimeExists(x.StartingPoint,x.EndingPoint)))
+            {
+                busRouteTimeRepository.Save(busRouteTime);
+            }
         }
     }
 }

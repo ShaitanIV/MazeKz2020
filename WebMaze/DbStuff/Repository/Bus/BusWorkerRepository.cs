@@ -10,5 +10,15 @@ namespace WebMaze.DbStuff.Repository
         {
         }
 
+        public bool WorkerExists(CitizenUser Worker)
+        {
+            return dbSet.Any(x => x.CitizenUser == Worker);
+        }
+
+        public BusWorker GetByCitizenUserId(long citizenUserId)
+        {
+            return dbSet.SingleOrDefault(x => x.CitizenUserId == citizenUserId);
+        }
+
     }
 }

@@ -22,19 +22,10 @@ namespace BusSimulation
                     busList.Add(new RealLifeBus(bus));
                 }
 
-                foreach (var bus in busList)
-                {
-                    foreach (var route in bus.Route)
-                    {
-                        Console.WriteLine(route);
-                    }
-                }
-
                 while (true)
                 {
                     foreach (var bus in busList)
                     {
-                        Console.WriteLine(bus.Bus.Id);
                         Console.WriteLine("Before CurrentOccupation:");
                         Console.WriteLine(bus.Bus.CurrentOccupation);
                         Console.WriteLine("Before Current Location");
@@ -47,9 +38,10 @@ namespace BusSimulation
                         Console.WriteLine("After Current Location:");
                         Console.WriteLine(bus.Bus.CurrentLocation);
                         Console.WriteLine("After Current Progression:");
-                        Console.WriteLine(bus.CurrentLocationProgression);
+                        Console.WriteLine(bus.CurrentLocationProgression);                      
                     }
-                    Thread.Sleep(2000);
+                    Thread.Sleep(4000);
+                    Console.Clear();
                     db.SaveChanges();
                 }
 
