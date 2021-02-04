@@ -328,6 +328,9 @@ namespace WebMaze.DbStuff
                     Capacity=60,
                     RegistrationPlate = "123AB12",
                     BusWorker = busWorkerRepository.GetByCitizenUserId(citizenUserRepository.GetUserByLogin("BusWorker1").Id),
+                    CurrentLocation ="",
+                    CurrentOccupation =0,
+                    ReversedDirection=false
                 }
             };
 

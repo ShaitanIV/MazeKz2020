@@ -33,6 +33,10 @@ namespace BusSimulation
                         Console.WriteLine("Before Current Progression:");
                         Console.WriteLine(bus.CurrentLocationProgression);
                         bus.MoveBus();
+                        if (!bus.Bus.CurrentLocation.Contains("-"))
+                        {
+                            bus.RandomizePassenger();
+                        }
                         Console.WriteLine("After CurrentOccupation:");
                         Console.WriteLine(bus.Bus.CurrentOccupation);
                         Console.WriteLine("After Current Location:");
@@ -40,7 +44,7 @@ namespace BusSimulation
                         Console.WriteLine("After Current Progression:");
                         Console.WriteLine(bus.CurrentLocationProgression);                      
                     }
-                    Thread.Sleep(4000);
+                    Thread.Sleep(1000);
                     Console.Clear();
                     db.SaveChanges();
                 }

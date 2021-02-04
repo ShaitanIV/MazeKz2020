@@ -35,6 +35,12 @@ namespace BusSimulation
         public RealLifeBus(Bus bus)
         {
             this.Bus = bus;
+
+            if (Bus.ReversedDirection==null)
+            {
+                Bus.ReversedDirection = false;
+            }
+
             Route = new List<string>();
 
             string tempRouteString;
@@ -49,6 +55,10 @@ namespace BusSimulation
                 if (k % 2 == 0)
                 {
                     Route.Add(tempRoute[k / 2]);
+                }
+                else if ((bool)bus.ReversedDirection)
+                {
+                    Route.Add(tempRoute[((k - 1) / 2) + 1] + "-" + tempRoute[(k - 1) / 2]);
                 }
                 else
                 {
@@ -93,7 +103,7 @@ namespace BusSimulation
             }
             else 
             {
-                Bus.CurrentOccupation -= rng.Next(20,Bus.Capacity-5);
+                Bus.CurrentOccupation = rng.Next(20,Bus.Capacity-5);
             }
 
         }
