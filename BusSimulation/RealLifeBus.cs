@@ -66,6 +66,11 @@ namespace BusSimulation
                 }
             }
 
+            if (Bus.CurrentLocation == null)
+            {
+                Bus.CurrentLocation = tempRoute[0];
+            }
+
             CurrentLocationProgression = 0;
             CurrentRouteLocationIndex = 0;
             MaximumLocationProgression = 1;

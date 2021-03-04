@@ -2,9 +2,9 @@
 @model BusOrderViewModel
 
 <div>
-    <a class="nav-link text-dark" href="/Bus/Index">Track Bus</a>
+    @Html.Partial("BusUserPartial")
 </div>
-<div> Form for companies to order bus </div>
+
 
 <form action="@Url.Action("OrderBus", "Bus")" method="post">
     <div>

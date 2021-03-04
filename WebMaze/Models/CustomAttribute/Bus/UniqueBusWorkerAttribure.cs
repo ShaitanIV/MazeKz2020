@@ -11,9 +11,9 @@ namespace WebMaze.Models.CustomAttribute
     {
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            if (value != null && !(value is long))
+            if (value != null && !(value is string))
             {
-                throw new Exception("Attribute works for long type");
+                throw new Exception("Attribute works for string type");
             }
 
             if (value == null)
@@ -21,11 +21,12 @@ namespace WebMaze.Models.CustomAttribute
                 return new ValidationResult("Value can't be null");
             }
 
-            var busWorkerID = (long)value;
+            var busWorkerLogin = (string)value;
 
             var busWorkerRepository = validationContext.GetService(typeof(BusWorkerRepository)) as BusWorkerRepository;
-            var existingWorker = busWorkerRepository.Get(busWorkerID);
-            if (existingWorker != null)
+            var citizenUserRepository = validationContext.GetService(typeof(CitizenUserRepository)) as CitizenUserRepository;
+            var citizenUser = citizenUserRepository.GetUserByLogin(busWorkerLogin);
+            if (busWorkerRepository.WorkerExists(citizenUser))
             {
                 return new ValidationResult("There is already an employee with the same ID");
             }

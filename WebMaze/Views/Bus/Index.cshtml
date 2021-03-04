@@ -1,7 +1,71 @@
 ﻿@using WebMaze.Models.Bus
+@model BusIndexViewModel
 
 
 <div>
-    @Html.Partial("BusAdminPartial")
+    @Html.Partial("BusUserPartial")
 </div>
-<div> Track bus and view map</div>
+
+<div>
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>
+                    Route number
+                </th>
+                <th>
+                    Route
+                </th>
+            </tr>
+            @foreach (var busRoute in Model.BusRouteList)
+            {
+                <tr>
+                    <td>@busRoute.Id</td>
+                    <td>@busRoute.Route</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div>
+    <form action="@Url.Action("Index", "Bus")" method="post">
+        <div>
+            <select name="BusRouteId">
+                @foreach (var busRoute in Model.BusRouteList)
+                {
+                    <option value="@busRoute.Id">@busRoute.Id</option>
+                }
+            </select>
+        </div>
+        @Html.HiddenFor(x => x.Buses)
+        @Html.HiddenFor(x=>x.BusRouteList)
+        <div>
+            <input type="submit" value="Track buses on this route" />
+        </div>
+    </form>
+</div>
+<div>
+    @if (Model.BusRouteId != 0)
+    {
+        <table class="table">
+            <tbody>
+                <tr>
+                    <th>
+                        Current Location
+                    </th>
+                    <th>
+                        Occupated seats
+                    </th>
+                </tr>
+                @foreach (var bus in Model.Buses)
+                {
+                    <tr>
+                        <td>@bus.CurrentLocation</td>
+                        <td>@bus.CurrentOccupation/@bus.Capacity</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

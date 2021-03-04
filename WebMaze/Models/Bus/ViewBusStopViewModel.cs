@@ -5,17 +5,15 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using WebMaze.DbStuff.Model;
-using WebMaze.Models.CustomAttribute;
 
 namespace WebMaze.Models.Bus
 {
-    public class ViewBusRouteViewModel
+    public class ViewBusStopViewModel
     {   
-        public List<BusRouteViewModel> Routes { get; set; }
-
-        public ViewBusRouteViewModel() :base()
+        public List<BusStopViewModel> BusStops { get; set; }
+        public ViewBusStopViewModel() :base()
         {
-            Routes = new List<BusRouteViewModel>();
+            BusStops = new List<BusStopViewModel>();
         }
 
     }

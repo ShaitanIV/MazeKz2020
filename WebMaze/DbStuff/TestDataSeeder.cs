@@ -39,6 +39,7 @@ namespace WebMaze.DbStuff
         {
             AddDoctors();
             AddPolicemen();
+            AddBusManagers();
             AddRegularUsers();
 
             AddCertificates();
@@ -47,6 +48,28 @@ namespace WebMaze.DbStuff
             AddBusRoutes();
             AddBusRouteTimes();
             AddBuses();
+        }
+
+        private void AddBusManagers()
+        {
+            var busManagers = new List<CitizenUser>()
+            {
+                new CitizenUser
+                {
+                    Login = "BusManager",
+                    Password = "123",
+                    Balance = 9999999,
+                    RegistrationDate = new DateTime(2020, 12, 30),
+                    LastLoginDate = new DateTime(2020, 12, 30),
+                    FirstName = "Johnny",
+                    LastName = "Silverhand",
+                    Gender = Gender.Male,
+                    Email = "CyberPrank@bug.com",
+                    PhoneNumber = "77777777",
+                    BirthDate = new DateTime(1988, 11, 16)
+                }
+            };
+            AddIfNotExistUsersWithRole(busManagers, "BusManager");
         }
 
         private void AddDoctors()
@@ -275,7 +298,7 @@ namespace WebMaze.DbStuff
                     break;
                 case "Bus driver license":
                     certificate.Description = "Official document, permitting a specific individual to operate bus.";
-                    certificate.IssuedBy = "Bus";
+                    certificate.IssuedBy = "Interior Ministry";
                     certificate.IssueDate = new DateTime(2020, 5, 3);
                     certificate.ExpiryDate = new DateTime(2030, 5, 3);
                     break;

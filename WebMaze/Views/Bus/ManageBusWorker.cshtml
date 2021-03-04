@@ -7,30 +7,42 @@
     @Html.Partial("BusAdminPartial")
 </div>
 
-<div>@foreach (var worker in Model.BusWorkers)
-{
-    <div>@worker.CertificateId @worker.CitizenUser.FirstName @worker.CitizenUser.LastName</div>
-}</div>
+<table class="table">
+    <tbody>
+        <tr>
+            <th>
+                Worker's first name
+            </th>
+            <th>
+                Worker's last name
+            </th>
+            <th>
+                Driver license id
+            </th>
+        </tr>
+        @foreach (var worker in Model.BusWorkers)
+        {
+            <tr>
+                <td>@worker.CitizenUser.FirstName</td>
+                <td>@worker.CitizenUser.LastName</td>
+                <td>@worker.CertificateId</td>
+            </tr>
+        }
+        </tbody>       
+</table>
+
 <div>
     <form action="@Url.Action("ManageBusWorker", "Bus")" method="post">
         <div>
-            Certificate Id: 
-            <select name="CertificateId">
-                @foreach(var certificate in Model.Certificates)
-                {
-                    <option value="@certificate.Id">@certificate.Id</option>
-                }
-            </select>
+            Certificate Id: @Html.TextBoxFor(x=>x.LicenseId)
         </div>
         <div>
-            Citizen Id: @Html.TextBoxFor(x => x.CitizenUserId)
+            Citizen Login: @Html.TextBoxFor(x => x.CitizenLogin)
         </div>
-            @Html.HiddenFor(x => x.Certificates)
             @Html.HiddenFor(x => x.BusWorkers)
-            @Html.HiddenFor(x => x.CitizenUsers)
     <div>
-        @Html.ValidationMessageFor(x => x.CitizenUserId)
-        @Html.ValidationMessageFor(x => x.CertificateId)
+        @Html.ValidationMessageFor(x => x.CitizenLogin)
+        @Html.ValidationMessageFor(x => x.LicenseId)
     </div>
         <div>
             <input type="submit" value="Add worker" />

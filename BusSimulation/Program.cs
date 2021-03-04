@@ -9,17 +9,23 @@ namespace BusSimulation
     {
         static void Main(string[] args)
         {
-            using(var db = new BusSimulationContext())
+            //Minutes for each step; 1 = 1 real life second
+            const int Latency = 1;
+            Console.WriteLine("Before CurrentOccupation:");
+            using (var db = new BusSimulationContext())
             {
                 foreach (var routeTime in db.BusRouteTime)
                 {
                     RealLifeBus.RouteTimeList.Add(new RouteTimeHelper(routeTime));
                 }
-
+                Console.WriteLine("Before CurrentOccupation:");
                 var busList = new List<RealLifeBus>();
                 foreach (var bus in db.Bus)
                 {
-                    busList.Add(new RealLifeBus(bus));
+                    if (bus.BusWorkerId!=null&&bus.BusRouteId!=null)
+                    {
+                        busList.Add(new RealLifeBus(bus));
+                    }
                 }
 
                 while (true)
@@ -44,7 +50,7 @@ namespace BusSimulation
                         Console.WriteLine("After Current Progression:");
                         Console.WriteLine(bus.CurrentLocationProgression);                      
                     }
-                    Thread.Sleep(1000);
+                    Thread.Sleep(Latency * 1000);
                     Console.Clear();
                     db.SaveChanges();
                 }

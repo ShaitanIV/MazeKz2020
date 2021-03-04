@@ -8,13 +8,10 @@ using WebMaze.DbStuff.Model;
 
 namespace WebMaze.Models.Bus
 {
-    public class BusRouteTimeViewModel
-    {   
-        public List<BusRouteTime> BusRouteTimes { get; set; }
-        public BusRouteTimeViewModel() :base()
-        {
-            BusRouteTimes = new List<BusRouteTime>();
-        }
+    public class BusRouteViewModel
+    {
+        public long Id { get; set; }
+        public string Route { get; set; }
 
     }
 }

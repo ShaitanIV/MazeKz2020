@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +16,7 @@ using WebMaze.Models.Bus;
 
 namespace WebMaze.Controllers
 {
+
     public class BusController : Controller
     {
         private BusRepository busRepository;
@@ -23,6 +25,7 @@ namespace WebMaze.Controllers
         private CertificateRepository certificateRepository;
         private BusOrderRepository busOrderRepository;
         private BusWorkerRepository busWorkerRepository;
+        private BusStopRepository busStopRepository;
         private IWebHostEnvironment hostEnvironment;
         private IMapper mapper;
 
@@ -32,6 +35,7 @@ namespace WebMaze.Controllers
          CertificateRepository certificateRepository,
          BusOrderRepository busOrderRepository,
          BusWorkerRepository busWorkerRepository,
+         BusStopRepository busStopRepository,
         IMapper mapper,
             IWebHostEnvironment hostEnvironment)
         {
@@ -41,6 +45,7 @@ namespace WebMaze.Controllers
             this.certificateRepository = certificateRepository;
             this.busOrderRepository = busOrderRepository;
             this.busWorkerRepository = busWorkerRepository;
+            this.busStopRepository = busStopRepository;
             this.mapper = mapper;
             this.hostEnvironment = hostEnvironment;
         }
@@ -48,20 +53,27 @@ namespace WebMaze.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-            return View();
+            var viewModel = new BusIndexViewModel();
+            viewModel.Buses = mapper.Map<List<BusViewModel>>(busRepository.GetAll());
+            viewModel.BusRouteList = mapper.Map<List<BusRouteViewModel>>(busRouteRepository.GetAll());
+            return View(viewModel);
         }
 
         [HttpPost]
-        public IActionResult Index(BusViewModel viewModel)
+        public IActionResult Index(BusIndexViewModel viewModel)
         {
-            return View();
+            viewModel.Buses = mapper.Map<List<BusViewModel>>(busRepository.GetAll().Where(x => x.BusRouteId == viewModel.BusRouteId && x.BusWorker != null).ToList());
+            viewModel.BusRouteList = mapper.Map<List<BusRouteViewModel>>(busRouteRepository.GetAll());
+            return View(viewModel);
         }
 
         [HttpGet]
+        [Authorize(Roles = "BusManager")]
         public IActionResult ManageBus()
         {
             var buses = busRepository.GetAll();
             var viewModel = new BusManageViewModel();
+
             foreach(var bus in buses)
             {
                 var model = mapper.Map<BusViewModel>(bus);
@@ -75,8 +87,14 @@ namespace WebMaze.Controllers
         {
             var bus = mapper.Map<Bus>(viewModel.Bus);
             bus.BusWorker = busWorkerRepository.Get((long)bus.BusWorkerId);
-            busRepository.Save(bus);
+            var busWithSelectedWorker = busRepository.GetBusWithWorker(viewModel.Bus.BusWorkerId);
 
+            if (busWithSelectedWorker != null)
+            {
+                busWithSelectedWorker.BusWorker = null;
+                busRepository.Save(busWithSelectedWorker);
+            }
+            busRepository.Save(bus);
 
             return RedirectToAction("ManageBus","Bus");
         }
@@ -99,6 +117,7 @@ namespace WebMaze.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "BusManager")]
         public IActionResult EditBus(long BusId)
         {
             var bus = busRepository.Get(BusId);
@@ -111,31 +130,50 @@ namespace WebMaze.Controllers
         {
             var bus = mapper.Map<Bus>(viewModel);
             bus.BusWorker = busWorkerRepository.Get((long)bus.BusWorkerId);
+            var busWithSelectedWorker = busRepository.GetBusWithWorker(viewModel.BusWorkerId);
+            if (busWithSelectedWorker!=null)
+            {
+                busWithSelectedWorker.BusWorker = null;
+                busRepository.Save(busWithSelectedWorker);
+            }
             busRepository.Save(bus);
             return Redirect("/Bus/ManageBus");
         }
 
         [HttpGet]
-        public IActionResult ViewBusRoute()
+        public IActionResult ViewBusRoutes()
         {
             var viewModel = new ViewBusRouteViewModel();
-            viewModel.Routes = busRouteRepository.GetAll().ToList();
+            viewModel.Routes = mapper.Map<List<BusRouteViewModel>>(busRouteRepository.GetAll().ToList());
             return View(viewModel);
         }
 
         [HttpGet]
-        public IActionResult ViewBusRouteTime()
+        public IActionResult ViewBusStops()
         {
+            var viewModel = new ViewBusStopViewModel();
+            viewModel.BusStops = mapper.Map<List<BusStopViewModel>>(busStopRepository.GetAll().ToList());
+            var BusRouteList = new List<BusRouteViewModel>();
+            BusRouteList = mapper.Map<List<BusRouteViewModel>>(busRouteRepository.GetAll().ToList());
+            foreach (var busStop in viewModel.BusStops)
+            {
+                foreach (var busRoute in BusRouteList)
+                {
+                    if (busRoute.Route.Contains(busStop.Name))
+                    {
+                        busStop.RouteIds.Add(busRoute.Id);
+                    }
+                }
+            }
             return View();
         }
 
         [HttpGet]
+        [Authorize(Roles = "BusManager")]
         public IActionResult ManageBusWorker()
         {
             var viewmodel = new ManageBusWorkerViewModel();
-            viewmodel.CitizenUsers = citizenUserRepository.GetAll();
             viewmodel.BusWorkers = busWorkerRepository.GetAll();
-            viewmodel.Certificates = certificateRepository.GetAll().Where(x => x.IssuedBy == "Bus").ToList();
             return View(viewmodel);
         }
 
@@ -143,12 +181,10 @@ namespace WebMaze.Controllers
         public IActionResult ManageBusWorker(ManageBusWorkerViewModel viewModel)
         {
             var busWorker = new BusWorker();
-            busWorker.Certificate = certificateRepository.Get(viewModel.CertificateId);
-            busWorker.CitizenUser = citizenUserRepository.Get(viewModel.CitizenUserId);
+            busWorker.Certificate = certificateRepository.Get(viewModel.LicenseId);
+            busWorker.CitizenUser = citizenUserRepository.GetUserByLogin(viewModel.CitizenLogin);
             busWorkerRepository.Save(busWorker);
-            viewModel.CitizenUsers = citizenUserRepository.GetAll();
             viewModel.BusWorkers = busWorkerRepository.GetAll();
-            viewModel.Certificates = certificateRepository.GetAll().Where(x => x.IssuedBy == "Bus").ToList();
             return View(viewModel);
         }
 
@@ -164,10 +200,3 @@ namespace WebMaze.Controllers
 
     }
 }
-
-/*
- 
-Автобусы. Просмотр доступных маршрутов, работников, транспорта и запрос на склад. Остановка.
-Статус автобуса и оповещение стоящих на остановке о том, что автобус переполнен и когда будет доступен следующий. 
-Прием заказов на использование автобуса компаниями.
-*/

@@ -15,5 +15,9 @@ namespace WebMaze.DbStuff.Repository
             return dbSet.Any(x => x.Route == busRoute);
         }
 
+        public List<long> GetAllId()
+        {
+            return dbSet.Select(x => x.Id).ToList();
+        }
     }
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using WebMaze.Models.CustomAttribute;
 
 namespace WebMaze.Models.Bus
 {
@@ -13,6 +14,7 @@ namespace WebMaze.Models.Bus
         [Required]
         public string RegistrationPlate { get; set; }
         [Required]
+        [CapacitySize]
         public int Capacity { get; set; }
         [Required]
         public string BusModel { get; set; }

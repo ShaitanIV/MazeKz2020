@@ -14,17 +14,14 @@ namespace WebMaze.Models.Bus
     {
         public long Id { get; set; }
         [Required]
-        public long CertificateId { get; set; }
-
+        [CertificateMatchesAttribure]
+        public long LicenseId { get; set; }
+        [Required]
         [UniqueBusWorker]
-        public long CitizenUserId { get; set; }
-        public List<CitizenUser> CitizenUsers { get; set; }
-        public List<Certificate> Certificates { get; set; }
+        public string CitizenLogin { get; set; }
         public List<BusWorker> BusWorkers { get; set; }
         public ManageBusWorkerViewModel() : base()
         {
-            CitizenUsers = new List<CitizenUser>();
-            Certificates = new List<Certificate>();
             BusWorkers = new List<BusWorker>();
         }
     }

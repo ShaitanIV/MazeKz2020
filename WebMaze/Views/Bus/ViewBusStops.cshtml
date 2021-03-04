@@ -1,0 +1,19 @@
+﻿@using WebMaze.Models.Bus
+@model ViewBusRouteViewModel
+
+<div>
+    @Html.Partial("BusAdminPartial")
+</div>
+
+
+<div>
+    <table>
+        @foreach (var route in Model.Routes)
+        {
+            <tr>
+                <td>@route.Id;</td>
+                <td>@route.Route;</td>
+            </tr>
+        }
+    </table>
+</div>

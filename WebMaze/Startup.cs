@@ -135,17 +135,14 @@ namespace WebMaze
             configurationExpression.CreateMap<Bus, BusViewModel>();
             configurationExpression.CreateMap<BusViewModel, Bus>();
 
-            configurationExpression.CreateMap<BusRoute, ViewBusRouteViewModel>();
-            configurationExpression.CreateMap<ViewBusRouteViewModel, BusRoute>();
-
-            configurationExpression.CreateMap<BusWorker, ManageBusWorkerViewModel>();
-            configurationExpression.CreateMap<ManageBusWorkerViewModel, BusWorker>();
+            configurationExpression.CreateMap<BusRoute, BusRouteViewModel>();
+            configurationExpression.CreateMap<BusRouteViewModel, BusRoute>();
 
             configurationExpression.CreateMap<BusOrder, BusOrderViewModel>();
             configurationExpression.CreateMap<BusOrderViewModel, BusOrder>();
 
-            configurationExpression.CreateMap<BusRouteTime, BusRouteTimeViewModel>();
-            configurationExpression.CreateMap<BusRouteTimeViewModel, BusRouteTime>();
+            configurationExpression.CreateMap<BusStop, BusStopViewModel>();
+            configurationExpression.CreateMap<BusStopViewModel, BusStop>();
 
             configurationExpression.CreateMap<Bus, BusOrderViewModel>();
             configurationExpression.CreateMap<BusOrderViewModel, Bus>();

@@ -1,0 +1,17 @@
+﻿@using WebMaze.Models.Bus
+
+
+<div class="row">
+    <div class="col-lg-6">
+        <a class="nav-link text-dark" href="/Bus/Index">Home</a>
+    </div>
+    <div class="col-lg-6">
+        <a class="nav-link text-dark" href="/Bus/OrderBus">Order bus</a>
+    </div>
+    @if (User.IsInRole("BusManager"))
+    {
+        <div class="col-lg-6">
+            <a class="nav-link text-dark" href="/Bus/ManageBus">Switch to admin panel</a>
+        </div>
+    }
+</div>
